@@ -1,0 +1,202 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Data.SqlClient;
+using System.Security.Cryptography.X509Certificates;
+
+namespace _7_12Razrabotka
+{
+    public class Product
+    {
+        private int id;
+        public int Id
+        {
+            get { return id; }
+            set { id = value; }
+        }
+        private string name;
+        public string Name
+        {
+            get { return name; }
+            set { name = value; }
+        }
+        private decimal price;
+        public decimal Price
+        {
+            get { return price; }
+            set { price = value; }
+        }
+        private int stock;
+        public int Stock
+        {
+            get { return stock; }
+            set { stock = value; }
+        }
+        public Product(int id, string name, decimal price, int stock)
+        {
+            this.id = id;
+            this.name = name;
+            this.price = price;
+            this.stock = stock;
+        }
+        public Product()
+        {
+            id = 0;
+            name = null;
+            price = 0;
+            stock = 0;
+        }
+        public List<Product> GetAllProducts()
+        {
+            List<Product> products = new List<Product>();
+            SqlConnection connection = new SqlConnection("Server = DESKTOP-45QDD5B; Database = Shops; integrated security = true;");
+            connection.Open();
+            using (connection)
+            {
+                SqlCommand getAll = new SqlCommand("select * from Product;", connection);
+                SqlDataReader rdr = getAll.ExecuteReader();
+                using (rdr)
+                {
+                    while(rdr.Read())
+                    {
+                        Product product = new Product();
+                        product.Id = rdr.GetInt32(0);
+                        product.name = rdr.GetString(1);
+                        product.price = rdr.GetDecimal(2);
+                        product.stock = rdr.GetInt32(3);
+                        products.Add(product);
+                    }
+                }
+            }
+            return products;
+        }
+        public List<Product> GetAllProductsGreaterThan5()
+        {
+            List<Product> products = new List<Product>();
+            SqlConnection connection = new SqlConnection("Server = DESKTOP-45QDD5B; Database = Shops; integrated security = true;");
+            connection.Open();
+            using (connection)
+            {
+                //SqlCommand getAll1 = new SqlCommand("select * from Product where price > 5;", connection);
+                SqlCommand getAll1 = new SqlCommand("select * from Product where price > @paramPrice;", connection);
+                getAll1.Parameters.AddWithValue("@paramPrice", 5);
+                SqlDataReader rdr = getAll1.ExecuteReader();
+                using (rdr)
+                {
+                    while (rdr.Read())
+                    {
+                        Product product = new Product();
+                        product.Id = rdr.GetInt32(0);
+                        product.name = rdr.GetString(1);
+                        product.price = rdr.GetDecimal(2);
+                        product.stock = rdr.GetInt32(3);
+                        products.Add(product);
+                    }
+                }
+            }
+            return products;
+        }
+        public List<Product> GetAllProductsWithNoStocks()
+        {
+            List<Product> products = new List<Product>();
+            SqlConnection connection = new SqlConnection("Server = DESKTOP-45QDD5B; Database = Shops; integrated security = true;");
+            connection.Open();
+            using (connection)
+            {
+                //SqlCommand getAll1 = new SqlCommand("select * from Product where stock <= 0;", connection);
+                SqlCommand getAll2 = new SqlCommand("select * from Product where stock <= @paramStock;", connection);
+                getAll2.Parameters.AddWithValue("@paramStock", 0);
+                SqlDataReader rdr = getAll2.ExecuteReader();
+                using (rdr)
+                {
+                    while (rdr.Read())
+                    {
+                        Product product = new Product();
+                        product.Id = rdr.GetInt32(0);
+                        product.name = rdr.GetString(1);
+                        product.price = rdr.GetDecimal(2);
+                        product.stock = rdr.GetInt32(3);
+                        products.Add(product);
+                    }
+                }
+            }
+            return products;
+        }
+        public void AddProduct(Product product)
+        {
+            SqlConnection connection = new SqlConnection("Server = DESKTOP-45QDD5B; Database = Shops; integrated security = true;");
+            connection.Open();
+            using (connection)
+            {
+                SqlCommand cmd = new SqlCommand("insert into Product(id, name, price, stock) values (@id, @name, @price, @stock)", connection);
+                cmd.Parameters.AddWithValue("@id", product.Id);
+                cmd.Parameters.AddWithValue("@name", product.Name);
+                cmd.Parameters.AddWithValue("@price", product.Price);
+                cmd.Parameters.AddWithValue("@stock", product.Stock);
+                cmd.ExecuteNonQuery();
+            }
+        }
+        public void DeleteProduct(int id)
+        {
+            SqlConnection connection = new SqlConnection("Server = DESKTOP-45QDD5B; Database = Shops; integrated security = true;");
+            connection.Open();
+            using (connection)
+            {
+                SqlCommand cmd = new SqlCommand("delete from Product where id = @id", connection);
+                cmd.Parameters.AddWithValue("@id", id);
+                cmd.ExecuteNonQuery();
+            }
+        }
+        public void UpdateProduct(int id, string name, decimal price, int stock)
+        {
+            SqlConnection connection = new SqlConnection("Server = DESKTOP-45QDD5B; Database = Shops; integrated security = true;");
+            connection.Open();
+            using (connection)
+            {
+                SqlCommand cmd = new SqlCommand("update Product set name = @name, price = @price, stock = @stock " +
+                    "where id = @id", connection);
+                cmd.Parameters.AddWithValue("@id", id);
+                cmd.Parameters.AddWithValue("@name", name);
+                cmd.Parameters.AddWithValue("@price", price);
+                cmd.Parameters.AddWithValue("@stock", stock);
+                cmd.ExecuteNonQuery();
+            }
+        }
+        public override string ToString()
+        {
+            return id.ToString() + " " + name.ToString() + " " + price.ToString() + " " + stock.ToString();
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+static void Main(string[] args)
+        {   
+            //Product product = new Product();
+            //List<Product> products = product.GetAllProducts();
+            //foreach(Product p in products)
+            //{
+            //    Console.WriteLine(p);
+            //}
+            Product product1 = new Product(6, "grizki", (decimal)0.80, 17);
+            product1.AddProduct(product1);
+            //product.DeleteProduct(2);
+            //product.UpdateProduct(1, "Voda Velingrad", (decimal)1.50, 150);
+        }
