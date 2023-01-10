@@ -130,7 +130,7 @@ namespace _7_12Razrabotka
             connection.Open();
             using (connection)
             {
-                SqlCommand cmd = new SqlCommand("insert into Product(id, name, price, stock) values (@id, @name, @price, @stock)", connection);
+                SqlCommand cmd = new SqlCommand("SET IDENTITY_INSERT Product ON; insert into Product(id, name, price, stock) values (@id, @name, @price, @stock); SET IDENTITY_INSERT Product ON;", connection);
                 cmd.Parameters.AddWithValue("@id", product.Id);
                 cmd.Parameters.AddWithValue("@name", product.Name);
                 cmd.Parameters.AddWithValue("@price", product.Price);
